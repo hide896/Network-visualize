@@ -45,9 +45,21 @@ function drawChart() {
         scales: {
             xAxes: [{
                 type: 'linear',
-                position: 'bottom'
+                position: 'bottom',
+                ticks: {
+                    beginAtZero: true,
+                    max: 256
+                }
+            }],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    max: 256
+                }
             }]
         },
+        pointRadius: 1,
+        pointHoverRadius: 1,
         aspectRatio: 1,
         events: [],
         animation: false
@@ -58,7 +70,7 @@ function drawChart() {
         data: {
             datasets: [{
                 label: 'パケットの分布',
-                data: [{x:208,y:137},{x:1,y:1},{x:250,y:255},{x:21,y:90}]
+                data: []
             }]
         },
         options: options
