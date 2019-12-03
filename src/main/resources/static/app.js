@@ -57,7 +57,7 @@ function drawChart() {
         type: 'scatter',
         data: {
             datasets: [{
-                label: 'Scatter Dataset',
+                label: 'パケットの分布',
                 data: [{x:208,y:137},{x:1,y:1},{x:250,y:255},{x:21,y:90}]
             }]
         },
