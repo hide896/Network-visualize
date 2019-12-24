@@ -29,6 +29,7 @@ dependencies {
 	compile 'org.webjars:bootstrap:4.3.1'
 	compile 'org.webjars:jquery:3.4.1'
 	compile 'org.webjars.npm:chart.js:2.9.3'
+	compile "org.springframework.integration:spring-integration-ip:5.2.2.RELEASE"
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {

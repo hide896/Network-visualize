@@ -20,6 +20,12 @@ public class PacketUsecase {
     @GetMapping
     public void savePackets(List<Packet> packets) throws InterruptedException {
         log.info("[START]");
+        if(packets.isEmpty()) {
+            log.error("Relieved an empty list");
+            return;
+        }
+        log.debug("SIZE = {}", packets.size());
+
         Random random = new Random();
         for(Packet packet : packets) {
             // TODO: あとで消す
