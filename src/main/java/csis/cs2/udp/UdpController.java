@@ -2,6 +2,7 @@ package csis.cs2.udp;
 
 import csis.cs2.websocket.entity.Packet;
 import csis.cs2.websocket.entity.PacketDto;
+import csis.cs2.websocket.repository.PacketDtoRepository;
 import csis.cs2.websocket.usecase.PacketUsecase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,9 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Controller;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.DatagramPacket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,28 +23,37 @@ public class UdpController {
     @Autowired
     private PacketUsecase packetUsecase;
 
+    @Autowired
+    private PacketDtoRepository packetDtoRepository;
+
     @ServiceActivator(inputChannel = "udpInboundChannel")
     public void handleMessage(byte[] bytes) throws UnsupportedEncodingException, InterruptedException {
-        DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
-        String string = new String(packet.getData(), "UTF-8");
-        String[] dataArray = string.split(",");
-        PacketDto packetDto = new PacketDto();
-        packetDto.setSourceIp(dataArray[0]);
-        packetDto.setDestinationIp(dataArray[1]);
-        packetDto.setSourcePort(Integer.parseInt(dataArray[2]));
-        packetDto.setDestinationPort(Integer.parseInt(dataArray[3]));
-        packetDto.setStringFlag(dataArray[4]);
+        DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length);
+        String wholePacketData = new String(datagramPacket.getData(), "UTF-8");
+        List<String> stringPacketList = Arrays.asList(wholePacketData.split("\n"));
+        List<PacketDto> packetDtoList = packetDtoRepository.getPacketDtoFromString(stringPacketList)
+        if(packetDtoList == null) {
+            log.error("PacketDtoList is null");
+            return;
+        }
+        if(packetDtoList.isEmpty()) {
+            log.error("PacketDtoList is empty");
+            return;
+        }
         // TODO: DBへの登録
-
-        packetUsecase.savePackets((List<Packet>) getPacketFromPacketDto(packetDto));
+        List<Packet> packetList = getPacketFromPacketDto(packetDtoList);
+        packetUsecase.savePackets(packetList);
     }
 
 
-    private Packet getPacketFromPacketDto(PacketDto packetDto) {
-        List<String> sourceOctets = Arrays.asList(packetDto.getSourceIp().split("."));
-//        List<String> destOctets = Arrays.asList(packetDto.getDestinationIp().split("."));
-        if(sourceOctets.size() < 4) return null;
-
-        return new Packet(Integer.parseInt(sourceOctets.get(2)), Integer.parseInt(sourceOctets.get(3)));
+    private List<Packet> getPacketFromPacketDto(List<PacketDto> packetDtoList) {
+        List<Packet> packetList = new ArrayList<Packet>();
+        for(PacketDto packetDto : packetDtoList) {
+            String[] sourceOctets = packetDto.getSourceIp().split("\\.");
+            if(sourceOctets.length < 4) continue;
+            Packet tmpPacket = new Packet(Integer.parseInt(sourceOctets[2]), Integer.parseInt(sourceOctets[3]));
+            packetList.add(tmpPacket);
+        }
+        return packetList;
     }
 }

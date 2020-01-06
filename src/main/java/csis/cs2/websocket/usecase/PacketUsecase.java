@@ -20,8 +20,12 @@ public class PacketUsecase {
     @GetMapping
     public void savePackets(List<Packet> packets) throws InterruptedException {
         log.info("[START]");
-        if(packets.isEmpty()) {
-            log.error("Relieved an empty list");
+        if(packets == null) {
+            log.error("Received null");
+            return;
+        }
+        if(packets.size() == 0) {
+            log.error("Received an empty list");
             return;
         }
         log.debug("SIZE = {}", packets.size());
