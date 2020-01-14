@@ -1,10 +1,6 @@
 let stompClient = null
 let scatterChart
 
-let startTime = 0
-const threTime = 60 * 1000 // 1 min
-let packetCount = 0
-
 $(function () {
     drawChart()
     $("form").on('submit', function (e) {
@@ -94,12 +90,6 @@ function drawChart() {
 }
 
 function addData(packets) {
-    if(startTime == 0) startTime = Date.now()
-    packetCount += packets.length
-    if(Date.now() - startTime > threTime) {
-        console.log({packetCount})
-        disconnect()
-    }
     for(let i = 0; i < packets.length; ++i) {
         scatterChart.data.datasets[0].data.push({x: packets[i].x, y: packets[i].y})
     }
