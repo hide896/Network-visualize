@@ -16,4 +16,5 @@ public class PacketDto {
     private String stringFlag;
     private long sequence;
     private int payloadLength;
+    private boolean isVisualizeTarget;
 }

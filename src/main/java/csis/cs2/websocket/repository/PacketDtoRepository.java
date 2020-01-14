@@ -10,6 +10,9 @@ import java.util.List;
 @Slf4j
 @Repository
 public class PacketDtoRepository {
+
+    private String visualizeTargetIpPrefix = "133.37";
+
     public List<PacketDto> getPacketDtoFromString(List<String> strings) {
         if(strings == null) {
             log.error("Received null");
@@ -34,6 +37,11 @@ public class PacketDtoRepository {
             tmpPacketDto.setDestinationPort(Integer.parseInt(packetElemString[3]));
             if(packetElemString.length > 4) {
                 tmpPacketDto.setStringFlag(packetElemString[4]);
+            }
+            if(tmpPacketDto.getDestinationIp().startsWith(visualizeTargetIpPrefix)) {
+                tmpPacketDto.setVisualizeTarget(true);
+            } else {
+                tmpPacketDto.setVisualizeTarget(false);
             }
             packetDtoList.add(tmpPacketDto);
         }

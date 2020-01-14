@@ -3,6 +3,7 @@ package csis.cs2.udp;
 import csis.cs2.websocket.entity.Packet;
 import csis.cs2.websocket.entity.PacketDto;
 import csis.cs2.websocket.repository.PacketDtoRepository;
+import csis.cs2.websocket.repository.PacketRepository;
 import csis.cs2.websocket.usecase.PacketUsecase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,8 @@ public class UdpController {
     @Autowired
     private PacketDtoRepository packetDtoRepository;
 
-    private String targetPacketIpPrefix = "133.37";
+    @Autowired
+    private PacketRepository packetRepository;
 
     @ServiceActivator(inputChannel = "udpInboundChannel")
     public void handleMessage(byte[] bytes) throws UnsupportedEncodingException, InterruptedException {
@@ -46,28 +48,11 @@ public class UdpController {
 
         // 描画対象のパケットのみ抽出
         List<PacketDto> targetPacketDtoList = packetDtoList.stream()
-                .filter(packetDto -> packetDto.getDestinationIp().startsWith(targetPacketIpPrefix))
+                .filter(packetDto -> packetDto.isVisualizeTarget())
                 .collect(Collectors.toList());
 
-        List<Packet> packetList = getPacketFromPacketDto(targetPacketDtoList);
+        List<Packet> packetList = packetRepository.getPacketFromPacketDto(targetPacketDtoList);
         log.info("Packet count = {}", packetList.size());
         packetUsecase.savePackets(packetList);
-    }
-
-
-    // TODO: PacketRepositoryとして移動
-    private List<Packet> getPacketFromPacketDto(List<PacketDto> packetDtoList) {
-        List<Packet> packetList = new ArrayList<Packet>();
-        for(PacketDto packetDto : packetDtoList) {
-            String destIp = packetDto.getDestinationIp();
-            if( !destIp.startsWith(targetPacketIpPrefix) ) {
-                continue;
-            }
-            String[] destIpOctets = destIp.split("\\.");
-            if(destIpOctets.length < 4) continue;
-            Packet tmpPacket = new Packet(Integer.parseInt(destIpOctets[3]), Integer.parseInt(destIpOctets[2]));    // x座標: 第4オクテット, y座標: 第3オクテット
-            packetList.add(tmpPacket);
-        }
-        return packetList;
     }
 }
