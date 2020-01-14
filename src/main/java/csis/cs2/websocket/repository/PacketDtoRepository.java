@@ -21,8 +21,9 @@ public class PacketDtoRepository {
         }
         List<PacketDto> packetDtoList = new ArrayList<PacketDto>();
         for(String string : strings) {
+            if(string.isEmpty()) continue;
             String[] packetElemString = string.split(",");
-            if(packetElemString.length == 0) {
+            if(packetElemString.length < 4) {
                 log.error("PacketListStrings contain empty element(s)");
                 continue;
             }

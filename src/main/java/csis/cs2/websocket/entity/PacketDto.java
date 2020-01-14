@@ -15,5 +15,5 @@ public class PacketDto {
     private int flag;
     private String stringFlag;
     private long sequence;
-    int payloadLength;
+    private int payloadLength;
 }

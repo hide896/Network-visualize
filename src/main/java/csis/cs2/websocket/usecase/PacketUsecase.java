@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
-import java.util.Random;
 
 @Slf4j
 @Service
@@ -30,12 +29,7 @@ public class PacketUsecase {
         }
         log.debug("SIZE = {}", packets.size());
 
-        Random random = new Random();
-        for(Packet packet : packets) {
-            // TODO: あとで消す
-            Thread.sleep(random.nextInt(50));
-            simpMessagingTemplate.convertAndSend("/topic/packets", packet);
-        }
+        simpMessagingTemplate.convertAndSend("/topic/packets", packets.toArray());
         log.info("[END]");
     }
 }

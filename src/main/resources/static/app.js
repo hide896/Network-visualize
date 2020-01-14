@@ -1,46 +1,61 @@
-let stompClient = null;
+let stompClient = null
 let scatterChart
+
+let startTime = 0
+const threTime = 60 * 1000 // 1 min
+let packetCount = 0
+
+$(function () {
+    drawChart()
+    $("form").on('submit', function (e) {
+        e.preventDefault();
+    });
+    $( "#connect" ).on("click", connect())
+    $( "#disconnect" ).on("click", disconnect())
+    $( "#send" ).on("click", sendName())
+})
+
 function setConnected(connected) {
-    $("#connect").prop("disabled", connected);
-    $("#disconnect").prop("disabled", !connected);
+    $("#connect").prop("disabled", connected)
+    $("#disconnect").prop("disabled", !connected)
     if (connected) {
-        $("#conversation").show();
+        $("#conversation").show()
     }
     else {
-        $("#conversation").hide();
+        $("#conversation").hide()
     }
-    $("#greetings").html("");
+    $("#greetings").html("")
 }
 
 function connect() {
-    const socket = new SockJS('/gs-guide-websocket');
-    stompClient = Stomp.over(socket);
+    const socket = new SockJS('/gs-guide-websocket')
+    stompClient = Stomp.over(socket)
     stompClient.connect({}, function (frame) {
-        setConnected(true);
-        console.log('Connected: ' + frame);
+        setConnected(true)
+        console.log('Connected: ' + frame)
         stompClient.subscribe('/topic/greetings', function (greeting) {
-            showGreeting(JSON.parse(greeting.body).content);
-        });
-        stompClient.subscribe('/topic/packets', function (packet) {
-            addData(JSON.parse(packet.body))
+            showGreeting(JSON.parse(greeting.body).content)
         })
-    });
+        stompClient.subscribe('/topic/packets', function (packets) {
+            addData(JSON.parse(packets.body))
+        })
+    })
 }
 
 function disconnect() {
     if (stompClient !== null) {
-        stompClient.disconnect();
+        stompClient.disconnect()
     }
-    setConnected(false);
-    console.log("Disconnected");
+    setConnected(false)
+    console.log("Disconnected")
 }
 
 function sendName() {
-    stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}));
+    stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}))
 }
 
 function drawChart() {
-    const ctx = document.getElementById('myChart').getContext('2d');
+    const ctx = document.getElementById('myChart').getContext('2d')
     const options = {
         scales: {
             xAxes: [{
@@ -74,25 +89,22 @@ function drawChart() {
             }]
         },
         options: options
-    });
+    })
 }
 
-function addData(packet) {
-    scatterChart.data.datasets[0].data.push({x: packet.x, y: packet.y})
+function addData(packets) {
+    if(startTime == 0) startTime = Date.now()
+    packetCount += packets.length
+    if(Date.now() - startTime > threTime) {
+        console.log({packetCount})
+        disconnect()
+    }
+    for(let i = 0; i < packets.length; ++i) {
+        scatterChart.data.datasets[0].data.push({x: packets[i].x, y: packets[i].y})
+    }
     scatterChart.update()
 }
 
 function showGreeting(message) {
     $("#greetings").append("<tr><td>" + message + "</td></tr>");
 }
-
-$(function () {
-    drawChart()
-    $("form").on('submit', function (e) {
-        e.preventDefault();
-    });
-    $( "#connect" ).click(function() { connect(); });
-    $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
-
-});
