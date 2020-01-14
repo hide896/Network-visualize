@@ -40,6 +40,7 @@ function connect() {
             addData(JSON.parse(packets.body))
         })
     })
+    stompClient.debug = null
 }
 
 function disconnect() {
