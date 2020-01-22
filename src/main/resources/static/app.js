@@ -74,7 +74,13 @@ function drawChart() {
         pointHoverRadius: 1,
         aspectRatio: 1,
         events: [],
-        animation: false
+        animation: {
+            duration: 0
+        },
+        hover: {
+            animationDuration: 0
+        },
+        responsiveAnimationDuration: 0
     }
 
     scatterChart = new Chart(ctx, {
@@ -90,9 +96,12 @@ function drawChart() {
 }
 
 function addData(packets) {
-    for(let i = 0; i < packets.length; ++i) {
-        scatterChart.data.datasets[0].data.push({x: packets[i].x, y: packets[i].y})
-    }
+    // let numToDel = scatterChart.data.datasets[0].data.length - 2000
+    // if(numToDel > 0) {
+    //     scatterChart.data.datasets[0].data.splice(0,numToDel);
+        // scatterChart.data.datasets[0].data = []
+    // }
+    Array.prototype.push.apply(scatterChart.data.datasets[0].data, packets)
     scatterChart.update()
 }
 
