@@ -1,7 +1,12 @@
 package csis.cs2.websocket.repository;
 
 import csis.cs2.websocket.entity.PacketDto;
+import jdk.nashorn.internal.objects.annotations.Getter;
+import jdk.nashorn.internal.objects.annotations.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -13,17 +18,17 @@ public class PacketDtoRepository {
 
     private String visualizeTargetIpPrefix = "133.37";
 
-    public List<PacketDto> getPacketDtoFromString(List<String> strings) {
-        if(strings == null) {
+    public List<PacketDto> getPacketDtoFromString(List<String> stringList) {
+        if(stringList == null) {
             log.error("Received null");
             return null;
         }
-        if(strings.size() == 0) {
+        if(stringList.size() == 0) {
             log.error("Received an empty list");
             return null;
         }
         List<PacketDto> packetDtoList = new ArrayList<PacketDto>();
-        for(String string : strings) {
+        for(String string : stringList) {
             if(string.isEmpty()) continue;
             String[] packetElemString = string.split(",");
             if(packetElemString.length < 4) {

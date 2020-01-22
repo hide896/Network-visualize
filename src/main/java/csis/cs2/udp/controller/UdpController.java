@@ -1,4 +1,4 @@
-package csis.cs2.udp;
+package csis.cs2.udp.controller;
 
 import csis.cs2.websocket.entity.Packet;
 import csis.cs2.websocket.entity.PacketDto;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
