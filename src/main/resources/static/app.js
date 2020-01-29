@@ -1,6 +1,12 @@
 let stompClient = null
 let scatterChart
 
+let startTime = 0
+const threTime = 60 * 1000
+let packetCount = 0
+
+let graphData = anychart.data.set([{x: 123, y: 123}, {x: 2, y: 245}, {x: 254, y: 2}])
+
 $(function () {
     drawChart()
     $("form").on('submit', function (e) {
@@ -52,57 +58,29 @@ function sendName() {
 }
 
 function drawChart() {
-    const ctx = document.getElementById('myChart').getContext('2d')
-    const options = {
-        scales: {
-            xAxes: [{
-                type: 'linear',
-                position: 'bottom',
-                ticks: {
-                    beginAtZero: true,
-                    max: 256
-                }
-            }],
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    max: 256
-                }
-            }]
-        },
-        pointRadius: 1,
-        pointHoverRadius: 1,
-        aspectRatio: 1,
-        events: [],
-        animation: {
-            duration: 0
-        },
-        hover: {
-            animationDuration: 0
-        },
-        responsiveAnimationDuration: 0
-    }
-
-    scatterChart = new Chart(ctx, {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                label: 'パケットの分布',
-                data: []
-            }]
-        },
-        options: options
-    })
+    scatterChart = anychart.scatter()
+    var series = scatterChart.marker(graphData)
+    series.size(1)
+    scatterChart.xGrid(true)
+    scatterChart.yGrid(true)
+    scatterChart.xMinorGrid(true)
+    scatterChart.yMinorGrid(true)
+    scatterChart.container("container")
+    scatterChart.draw()
 }
 
 function addData(packets) {
-    // let numToDel = scatterChart.data.datasets[0].data.length - 2000
-    // if(numToDel > 0) {
-    //     scatterChart.data.datasets[0].data.splice(0,numToDel);
-        // scatterChart.data.datasets[0].data = []
+    for(let i in packets) {
+        graphData.append({x: packets[i].x, y: packets[i].y})
+    }
+    // if(startTime == 0) startTime = Date.now()
+    // packetCount += packets.length
+    // if(Date.now() - startTime > threTime) {
+    //     console.log({packetCount})
+    //     disconnect()
     // }
-    Array.prototype.push.apply(scatterChart.data.datasets[0].data, packets)
-    scatterChart.update()
+    // Array.prototype.push.apply(scatterChart.data.datasets[0].data, packets)
+    // scatterChart.update()
 }
 
 function showGreeting(message) {
