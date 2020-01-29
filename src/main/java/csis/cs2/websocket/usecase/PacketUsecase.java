@@ -7,7 +7,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -16,10 +18,12 @@ public class PacketUsecase {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
+    private static List<Packet> dataToSend;
+
     @GetMapping
     public void savePackets(List<Packet> packets) throws InterruptedException {
-        log.info("[START]");
-        if(packets == null) {
+        log.debug("[START]");
+        if(Objects.isNull(packets)) {
             log.error("Received null");
             return;
         }
@@ -27,9 +31,19 @@ public class PacketUsecase {
             log.error("Received an empty list");
             return;
         }
-        log.debug("SIZE = {}", packets.size());
 
-        simpMessagingTemplate.convertAndSend("/topic/packets", packets.toArray());
-        log.info("[END]");
+        if(Objects.isNull(dataToSend)) {
+            dataToSend = packets;
+        } else {
+            dataToSend.addAll(packets);
+        }
+
+        if(dataToSend.size() > 1000) {
+            log.info("Sent w/ WebSocket {} packets.", dataToSend.size());
+            simpMessagingTemplate.convertAndSend("/topic/packets", dataToSend.toArray());
+            dataToSend.clear();
+        }
+
+        log.debug("[END]");
     }
 }
