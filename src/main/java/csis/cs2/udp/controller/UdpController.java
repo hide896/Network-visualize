@@ -51,7 +51,7 @@ public class UdpController {
                 .collect(Collectors.toList());
 
         List<Packet> packetList = packetRepository.getPacketFromPacketDto(targetPacketDtoList);
-        log.info("Packet count = {}", packetList.size());
+        log.debug("Packet count = {}", packetList.size());
         packetUsecase.savePackets(packetList);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Repository
@@ -19,12 +20,12 @@ public class PacketDtoRepository {
     private String visualizeTargetIpPrefix = "133.37";
 
     public List<PacketDto> getPacketDtoFromString(List<String> stringList) {
-        if(stringList == null) {
-            log.error("Received null");
+        if(Objects.isNull(stringList)) {
+            log.debug("Received null");
             return null;
         }
         if(stringList.size() == 0) {
-            log.error("Received an empty list");
+            log.debug("Received an empty list");
             return null;
         }
         List<PacketDto> packetDtoList = new ArrayList<PacketDto>();
@@ -32,7 +33,7 @@ public class PacketDtoRepository {
             if(string.isEmpty()) continue;
             String[] packetElemString = string.split(",");
             if(packetElemString.length < 4) {
-                log.error("PacketListStrings contain empty element(s)");
+                log.debug("PacketListStrings contain empty element(s)");
                 continue;
             }
             PacketDto tmpPacketDto = new PacketDto();
