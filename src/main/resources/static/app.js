@@ -58,27 +58,21 @@ function sendName() {
 }
 
 function drawChart() {
-    scatterChart = anychart.scatter()
-    var series = scatterChart.marker(graphData)
-    series.size(1)
-    scatterChart.xGrid(true)
-    scatterChart.yGrid(true)
-    scatterChart.xMinorGrid(true)
-    scatterChart.yMinorGrid(true)
-    scatterChart.container("container")
-    scatterChart.draw()
+    scatterChart = acgraph.create("container")
 }
 
 function addData(packets) {
-    for(let i in packets) {
-        graphData.append({x: packets[i].x, y: packets[i].y})
+    if(startTime == 0) startTime = Date.now()
+    packetCount += packets.length
+    if(Date.now() - startTime > threTime) {
+        console.log({packetCount})
+        disconnect()
     }
-    // if(startTime == 0) startTime = Date.now()
-    // packetCount += packets.length
-    // if(Date.now() - startTime > threTime) {
-    //     console.log({packetCount})
-    //     disconnect()
-    // }
+    scatterChart.suspend()
+    for(let i in packets) {
+        scatterChart.circle(packets[i].x * 3.2, packets[i].y * 3.2, 0.5).fill("black")
+    }
+    scatterChart.resume()
     // Array.prototype.push.apply(scatterChart.data.datasets[0].data, packets)
     // scatterChart.update()
 }
