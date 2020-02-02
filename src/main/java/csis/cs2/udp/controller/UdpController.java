@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class UdpController {
         DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length);
         String wholePacketData = new String(datagramPacket.getData(), "UTF-8");
         List<String> stringPacketList = Arrays.asList(wholePacketData.split("\n"));
+        log.info("String lines count : {}", stringPacketList.size());
         List<PacketDto> packetDtoList = packetDtoRepository.getPacketDtoFromString(stringPacketList);
         if(packetDtoList == null) {
             log.error("PacketDtoList is null");
@@ -44,14 +46,14 @@ public class UdpController {
             return;
         }
         // TODO: DBへの登録
-
+        log.info("PacketDtoList size: {}", packetDtoList.size());
         // 描画対象のパケットのみ抽出
-        List<PacketDto> targetPacketDtoList = packetDtoList.stream()
-                .filter(packetDto -> packetDto.isVisualizeTarget())
-                .collect(Collectors.toList());
+//        List<PacketDto> targetPacketDtoList = packetDtoList.stream()
+//                .filter(packetDto -> packetDto.isVisualizeTarget())
+//                .collect(Collectors.toList());
 
-        List<Packet> packetList = packetRepository.getPacketFromPacketDto(targetPacketDtoList);
+        List<Packet> packetList = packetRepository.getPacketFromPacketDto(packetDtoList);
         log.debug("Packet count = {}", packetList.size());
-        packetUsecase.savePackets(packetList);
+        packetUsecase.savePackets(new HashSet<Packet>(packetList));
     }
 }

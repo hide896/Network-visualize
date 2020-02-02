@@ -62,6 +62,8 @@ function drawChart() {
 }
 
 function addData(packets) {
+    console.log("x: " + packets[0].x)
+    console.log("y: " + packets[0].y)
     if(startTime == 0) startTime = Date.now()
     packetCount += packets.length
     if(Date.now() - startTime > threTime) {
@@ -70,7 +72,7 @@ function addData(packets) {
     }
     scatterChart.suspend()
     for(let i in packets) {
-        scatterChart.circle(packets[i].x * 3.2, packets[i].y * 3.2, 0.5).fill("black")
+        scatterChart.circle(packets[i].x * 5, packets[i].y * 5, 0.5).fill("black")
     }
     scatterChart.resume()
     // Array.prototype.push.apply(scatterChart.data.datasets[0].data, packets)
