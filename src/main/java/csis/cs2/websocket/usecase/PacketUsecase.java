@@ -1,32 +1,25 @@
 package csis.cs2.websocket.usecase;
 
 import csis.cs2.websocket.entity.Packet;
+import csis.cs2.websocket.repository.DataToSendRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.spel.ast.NullLiteral;
+import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.annotation.PostConstruct;
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+//@Scope("prototype")
 public class PacketUsecase {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private DataToSendRepository dataToSendRepository;
 
-    private long lastSentTime = System.currentTimeMillis();
-    private final long sendDataInterval = 250;  // 0.5秒
-    private HashMap<Packet, Integer> packetsCountCollection = new HashMap<>();
-
-    private int totalPacketCount = 0;
-
-    @GetMapping
     public void savePackets(Set<Packet> packets) throws InterruptedException {
         log.debug("[START]");
         if(Objects.isNull(packets)) {
@@ -37,24 +30,23 @@ public class PacketUsecase {
             log.error("Received an empty list");
             return;
         }
-        for(Packet tmpPacket : packets) {
-            int tmpCount = packetsCountCollection.getOrDefault(tmpPacket, 0);
-            packetsCountCollection.put(tmpPacket, tmpCount+1);
-        }
+        dataToSendRepository.addData(new ArrayList<>(packets));
         long currentTime = System.currentTimeMillis();
-        if(currentTime - lastSentTime > sendDataInterval) {
-            Object[] dataToSend = packetsCountCollection.entrySet().stream()
-                    .filter(ip -> ip.getValue() < 3)
-                    .map(ip -> ip.getKey())
-                    .toArray();
-            totalPacketCount += dataToSend.length;
-//            log.info("Total: {} packets.", totalPacketCount);
-//            log.info("obj: {}", dataToSend[0]);
-            simpMessagingTemplate.convertAndSend("/topic/packets", dataToSend);
-            lastSentTime = currentTime;
-            packetsCountCollection.clear();
+        List<Packet> tmpList = dataToSendRepository.getCurrent();
+        // sending packets per 1000 ms or 1000 packets
+        if(currentTime - dataToSendRepository.getLastSentTime() > 1000 || tmpList.size() > 10000) {
+            sendPackets(tmpList, currentTime);
         }
-
         log.debug("[END]");
     }
+
+    public void sendPackets(List<Packet> dataToSend, long currentTime) {
+//        log.info("Sent size: {}", dataToSend.size());
+        simpMessagingTemplate.convertAndSend("/topic/packets", dataToSend.toArray());
+        dataToSendRepository.setLastSentTime(currentTime);
+        log.info("Total packet count: {}", dataToSendRepository.getTotalPacketCount());
+        dataToSendRepository.updateCountAndClearData();
+    }
+
+
 }
