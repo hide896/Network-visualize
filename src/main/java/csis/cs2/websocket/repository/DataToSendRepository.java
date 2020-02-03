@@ -37,8 +37,12 @@ public class DataToSendRepository {
         return this.dataToSend.peekLast();
     }
 
-    public void updateCountAndClearData() {
+    public void updateCount(int sentAmount) {
+        this.totalPacketCount += sentAmount;
+    }
+
+    public void clearData() {
         this.dataToSend.offerLast(new ArrayList<>());
-        totalPacketCount += dataToSend.pollFirst().size();
+        this.dataToSend.pollFirst();
     }
 }

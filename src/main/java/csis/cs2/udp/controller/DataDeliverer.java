@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@Scope("prototype")
+//@Scope("prototype")
 public class DataDeliverer {
 
     @Autowired

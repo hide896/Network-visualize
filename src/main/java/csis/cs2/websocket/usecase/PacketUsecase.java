@@ -36,16 +36,16 @@ public class PacketUsecase {
         // sending packets per 1000 ms or 1000 packets
         if(currentTime - dataToSendRepository.getLastSentTime() > 1000 || tmpList.size() > 10000) {
             sendPackets(tmpList, currentTime);
+            dataToSendRepository.clearData();
         }
         log.debug("[END]");
     }
 
     public void sendPackets(List<Packet> dataToSend, long currentTime) {
-//        log.info("Sent size: {}", dataToSend.size());
         simpMessagingTemplate.convertAndSend("/topic/packets", dataToSend.toArray());
+        dataToSendRepository.updateCount(dataToSend.size());
         dataToSendRepository.setLastSentTime(currentTime);
         log.info("Total packet count: {}", dataToSendRepository.getTotalPacketCount());
-        dataToSendRepository.updateCountAndClearData();
     }
 
 
