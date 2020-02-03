@@ -46,7 +46,6 @@ function drawChart() {
 
 function addData(packets) {
     packetCount += packets.length
-    console.log({packetCount})
     if(startTime == 0) startTime = Date.now()
     if(Date.now() - startTime > threTime) {
         console.log({packetCount})
@@ -56,7 +55,7 @@ function addData(packets) {
     scatterChart.suspend()
     packets.forEach(packet => {
         if(packet != null) {
-            scatterChart.circle(packet.x * 3.5, packet.y * 3.5, 1).fill("black")
+            scatterChart.circle(packet.x * 3.5, packet.y * 3.5, 1.5).fill("black")
         }
     })
     scatterChart.resume()

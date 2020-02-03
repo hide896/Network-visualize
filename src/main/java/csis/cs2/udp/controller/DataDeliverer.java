@@ -7,10 +7,9 @@ import csis.cs2.websocket.repository.PacketRepository;
 import csis.cs2.websocket.usecase.PacketUsecase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
+
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.Set;
 
 @Slf4j
 @Component
-//@Scope("prototype")
 public class DataDeliverer {
 
     @Autowired
@@ -34,6 +32,7 @@ public class DataDeliverer {
     public void deliverData(DatagramPacket datagramPacket) throws Exception {
         String wholePacketData = new String(datagramPacket.getData(), "UTF-8");
         List<String> stringPacketList = Arrays.asList(wholePacketData.split("\n"));
+
         List<PacketDto> packetDtoList = packetDtoRepository.getPacketDtoFromString(stringPacketList);
         if(packetDtoList == null) {
             log.error("packetDtoList is null");
