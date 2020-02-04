@@ -35,8 +35,8 @@ public class PacketUsecase {
         List<Packet> tmpList = dataToSendRepository.getCurrent();
         // sending packets per 1000 ms or 1000 packets
         if(currentTime - dataToSendRepository.getLastSentTime() > 1000 || tmpList.size() > 10000) {
-            sendPackets(tmpList, currentTime);
             dataToSendRepository.clearData();
+            sendPackets(tmpList, currentTime);
         }
         log.debug("[END]");
     }

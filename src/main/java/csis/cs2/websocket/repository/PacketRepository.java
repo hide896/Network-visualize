@@ -23,7 +23,7 @@ public class PacketRepository {
             log.debug("Received an empty list");
             return null;
         }
-        Set<Packet> packetList = new HashSet<Packet>();
+        Set<Packet> packetSet = new HashSet<Packet>();
         for(PacketDto packetDto : packetDtoList) {
             String destIp = packetDto.getDestinationIp();
             if( !packetDto.isVisualizeTarget() ) {
@@ -31,8 +31,8 @@ public class PacketRepository {
             }
             String[] destIpOctets = destIp.split("\\.");
             if(destIpOctets.length < 4) continue;
-            packetList.add(new Packet(Integer.parseInt(destIpOctets[3]), Integer.parseInt(destIpOctets[2])));   // x座標: 第4オクテット, y座標: 第3オクテット
+            packetSet.add(new Packet(Integer.parseInt(destIpOctets[3]), Integer.parseInt(destIpOctets[2])));   // x座標: 第4オクテット, y座標: 第3オクテット
         }
-        return packetList;
+        return packetSet;
     }
 }
