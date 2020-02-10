@@ -47,7 +47,7 @@ public class DataToSendRepository {
     }
 
     public void clearData() {
-        this.dataToSend.offerLast(new ArrayList<>());
+        this.dataToSend.offerLast(new ArrayList<Packet>());
         this.dataToSend.pollFirst();
     }
 }
