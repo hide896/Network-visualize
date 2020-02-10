@@ -2,7 +2,7 @@ let stompClient = null
 let scatterChart
 
 let startTime = 0
-const threTime = 60 * 1000
+const threTime = 30 * 1000
 let packetCount = 0
 
 $(function () {
