@@ -30,7 +30,12 @@ public class DataToSendRepository {
     }
 
     public void addData(List<Packet> packets) {
-        this.dataToSend.peekLast().addAll(packets);
+        try {
+            this.dataToSend.peekLast().addAll(packets);
+        } catch(NullPointerException e) {
+            log.error("NULL POINTER EXCEPTION");
+        }
+
     }
 
     public List<Packet> getCurrent() {

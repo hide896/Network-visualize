@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -34,6 +35,7 @@ public class PacketUsecase {
         long currentTime = System.currentTimeMillis();
         List<Packet> tmpList = dataToSendRepository.getCurrent();
         // sending packets per 1000 ms or 1000 packets
+        if(CollectionUtils.isEmpty(tmpList)) return;
         if(currentTime - dataToSendRepository.getLastSentTime() > 1000 || tmpList.size() > 10000) {
             dataToSendRepository.clearData();
             sendPackets(tmpList, currentTime);
@@ -42,6 +44,7 @@ public class PacketUsecase {
     }
 
     public void sendPackets(List<Packet> dataToSend, long currentTime) {
+        if(Objects.isNull(dataToSend)) return;
         simpMessagingTemplate.convertAndSend("/topic/packets", dataToSend.toArray());
         dataToSendRepository.updateCount(dataToSend.size());
         dataToSendRepository.setLastSentTime(currentTime);
